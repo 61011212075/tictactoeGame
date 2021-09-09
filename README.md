@@ -39,7 +39,9 @@
       board.every((values) => values.every((value) => value != Player.none));
 ```
 * การเช็คการชนะของเกม
-   * การเช็คการชนะของเกม 3x3
+   * ```targetWin``` เท่ากับ 3
+   * การเช็คการชนะของเกม 3x3 โดยเช็คเฉพาะ row และ column ที่ ```player``` กด ```x``` = row และ ```y``` = column
+ ```player``` คือผู้ที่กด โดยจะวน loop นับว่าเรียงกันกันเท่ากับ ```targetWin``` หรือไม่ ถ้าเท่าก็จะ return true(ชนะ) ส่วนแนวทะแยงเช็คทุกแนว
 ``` dart
 for (int i = 0; i < sizeBoard; i++) {
         if (board[x][i] == player) row++; //แนวนอน
@@ -54,7 +56,9 @@ for (int i = 0; i < sizeBoard; i++) {
           slop == targetWin ||
           rslop == targetWin;
 ```
-   * การเช็คการชนะของเกม 4x4 และ 5x5
+* การเช็คการชนะของเกม 4x4 และ 5x5
+   * ```targetWin``` ถ้า 4x4 จะเท่ากับ 3 ถ้า 5x5 จะเท่ากับ 4 
+   *   การเช็คการชนะเหมือนกับของเกม 3x3 แต่จะมีแนวทะแยงที่ติดกับแนวทะแยตรงกลางเพิ่มขึ้นมา
 ``` dart
    for (int i = 0; i < sizeBoard; i++) {
         //แนวนอน
