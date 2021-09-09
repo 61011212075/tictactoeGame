@@ -112,3 +112,4 @@ for (int i = 0; i < sizeBoard; i++) {
 ```
 * การเก็บ History ของเกม
    * ใช้ localstore 1.2.0
+   * https://pub.dev/packages/localstore
