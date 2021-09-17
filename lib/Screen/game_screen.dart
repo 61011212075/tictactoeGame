@@ -107,7 +107,7 @@ class _GameScreenState extends State<GameScreen> {
                     onPressed: () => setState(() {
                           setEmptyFields();
                           if (currentPlayer == Player.X &&
-                              widget.mode == mode_vsBotEasy)
+                              widget.mode != mode_vsFriend)
                             setState(() {
                               Random random = new Random();
                               board[random.nextInt(widget.selectedSize)]
@@ -202,24 +202,28 @@ class _GameScreenState extends State<GameScreen> {
         return;
       }
 
-      if (widget.mode == mode_vsBotEasy) {
+      if (widget.mode != mode_vsFriend) {
         setState(() {
-          // while (newValue == Player.X && !isEnd()) {
-          //   Random random = new Random();
-          //   x = random.nextInt(widget.selectedSize);
-          //   y = random.nextInt(widget.selectedSize);
-          //   if (board[x][y] == Player.none) {
-          //     board[x][y] = Player.O;
-          //     newValue = currentPlayer = Player.O;
-          //     break;
-          //   }
-          // }
-          List<List<String>> newBoard = new List<List<String>>.from(board);
-          List<int> result = MiniMax().move(newBoard);
-          x = result[0];
-          y = result[1];
-          board[x][y] = Player.O;
-          newValue = currentPlayer = Player.O;
+          if (widget.mode == mode_vsBotEasy) {
+            while (newValue == Player.X && !isEnd()) {
+              Random random = new Random();
+              x = random.nextInt(widget.selectedSize);
+              y = random.nextInt(widget.selectedSize);
+              if (board[x][y] == Player.none) {
+                board[x][y] = Player.O;
+                newValue = currentPlayer = Player.O;
+                break;
+              }
+            }
+          } else {
+            // Call miniMax
+            List<List<String>> newBoard = new List<List<String>>.from(board);
+            List<int> result = MiniMax().move(newBoard);
+            x = result[0];
+            y = result[1];
+            board[x][y] = Player.O;
+            newValue = currentPlayer = Player.O;
+          }
         });
 
         if (isWinnerMai(x, y)) {
@@ -247,82 +251,82 @@ class _GameScreenState extends State<GameScreen> {
   bool isEnd() =>
       board.every((values) => values.every((value) => value != Player.none));
 
-  bool isWinner(int x, int y) {
-    var col = 0, row = 0, slop = 0, rslop = 0;
-    var brslop = 0, arslop = 0, bslop = 0, aslop = 0;
-    final player = board[x][y];
-    final sizeBoard = widget.selectedSize;
-    final targetWin = sizeBoard <= 4 ? 3 : 4;
+  // bool isWinner(int x, int y) {
+  //   var col = 0, row = 0, slop = 0, rslop = 0;
+  //   var brslop = 0, arslop = 0, bslop = 0, aslop = 0;
+  //   final player = board[x][y];
+  //   final sizeBoard = widget.selectedSize;
+  //   final targetWin = sizeBoard <= 4 ? 3 : 4;
 
-    if (sizeBoard == 3) {
-      for (int i = 0; i < sizeBoard; i++) {
-        if (board[x][i] == player) row++; //แนวนอน
-        if (board[i][y] == player) col++; // แนวตั้ง
-        if (board[i][i] == player) slop++; //แนวทะแยงจากซ้ายบนลงขวาล่าง
-        if (board[i][sizeBoard - i - 1] == player)
-          rslop++; //แนวทะแยงจากขวาบนลงล่างซ้าย
-      }
-      // ถ้านับอันใดอัน เท่ากับ targetWin จะ return true
-      return row == targetWin ||
-          col == targetWin ||
-          slop == targetWin ||
-          rslop == targetWin;
-    } else {
-      for (int i = 0; i < sizeBoard; i++) {
-        //แนวนอน
-        if (board[x][i] == player)
-          row++;
-        else {
-          row = (row == targetWin)
-              ? row
-              : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
-        }
-        // แนวตั้ง
-        if (board[i][y] == player)
-          col++;
-        else {
-          col = (col == targetWin)
-              ? col
-              : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
-        }
-        //แนวทะแยงจากซ้ายบนลงขวาล่าง
-        if (board[i][i] == player) {
-          slop++;
-        } else if (i < sizeBoard - 1) {
-          if (board[i + 1][i] == player)
-            bslop++; //แนวทะแยงจากซ้ายบนลงขวาล่าง ด้านสั้น
-          if (board[i][i + 1] == player)
-            aslop++; //แนวทะแยงจากซ้ายบนลงขวาล่าง ด้านสั้น
-        } else {
-          slop = (slop == targetWin)
-              ? slop
-              : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
-        }
-        //แนวทะแยงจากขวาบนลงล่างซ้าย
-        if (board[i][sizeBoard - i - 1] == player) {
-          rslop++;
-        } else if (i < sizeBoard - 1) {
-          if (board[i][sizeBoard - i - 2] == player)
-            brslop++; //แนวทะแยงจากขวาบนลงล่างซ้าย ด้านสั้น
-          if (board[i + 1][sizeBoard - i - 1] == player)
-            arslop++; //แนวทะแยงจากขวาบนลงล่างซ้าย ด้านสั้น
-        } else {
-          rslop = (rslop == targetWin)
-              ? rslop
-              : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
-        }
-      }
-      // ถ้านับอันใดอัน เท่ากับ targetWin จะ return true
-      return row >= targetWin ||
-          col >= targetWin ||
-          slop >= targetWin ||
-          rslop >= targetWin ||
-          brslop >= targetWin ||
-          arslop >= targetWin ||
-          bslop >= targetWin ||
-          aslop >= targetWin;
-    }
-  }
+  //   if (sizeBoard == 3) {
+  //     for (int i = 0; i < sizeBoard; i++) {
+  //       if (board[x][i] == player) row++; //แนวนอน
+  //       if (board[i][y] == player) col++; // แนวตั้ง
+  //       if (board[i][i] == player) slop++; //แนวทะแยงจากซ้ายบนลงขวาล่าง
+  //       if (board[i][sizeBoard - i - 1] == player)
+  //         rslop++; //แนวทะแยงจากขวาบนลงล่างซ้าย
+  //     }
+  //     // ถ้านับอันใดอัน เท่ากับ targetWin จะ return true
+  //     return row == targetWin ||
+  //         col == targetWin ||
+  //         slop == targetWin ||
+  //         rslop == targetWin;
+  //   } else {
+  //     for (int i = 0; i < sizeBoard; i++) {
+  //       //แนวนอน
+  //       if (board[x][i] == player)
+  //         row++;
+  //       else {
+  //         row = (row == targetWin)
+  //             ? row
+  //             : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
+  //       }
+  //       // แนวตั้ง
+  //       if (board[i][y] == player)
+  //         col++;
+  //       else {
+  //         col = (col == targetWin)
+  //             ? col
+  //             : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
+  //       }
+  //       //แนวทะแยงจากซ้ายบนลงขวาล่าง
+  //       if (board[i][i] == player) {
+  //         slop++;
+  //       } else if (i < sizeBoard - 1) {
+  //         if (board[i + 1][i] == player)
+  //           bslop++; //แนวทะแยงจากซ้ายบนลงขวาล่าง ด้านสั้น
+  //         if (board[i][i + 1] == player)
+  //           aslop++; //แนวทะแยงจากซ้ายบนลงขวาล่าง ด้านสั้น
+  //       } else {
+  //         slop = (slop == targetWin)
+  //             ? slop
+  //             : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
+  //       }
+  //       //แนวทะแยงจากขวาบนลงล่างซ้าย
+  //       if (board[i][sizeBoard - i - 1] == player) {
+  //         rslop++;
+  //       } else if (i < sizeBoard - 1) {
+  //         if (board[i][sizeBoard - i - 2] == player)
+  //           brslop++; //แนวทะแยงจากขวาบนลงล่างซ้าย ด้านสั้น
+  //         if (board[i + 1][sizeBoard - i - 1] == player)
+  //           arslop++; //แนวทะแยงจากขวาบนลงล่างซ้าย ด้านสั้น
+  //       } else {
+  //         rslop = (rslop == targetWin)
+  //             ? rslop
+  //             : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
+  //       }
+  //     }
+  //     // ถ้านับอันใดอัน เท่ากับ targetWin จะ return true
+  //     return row >= targetWin ||
+  //         col >= targetWin ||
+  //         slop >= targetWin ||
+  //         rslop >= targetWin ||
+  //         brslop >= targetWin ||
+  //         arslop >= targetWin ||
+  //         bslop >= targetWin ||
+  //         aslop >= targetWin;
+  //   }
+  // }
 
   bool isWinnerMai(int x, int y) {
     final player = board[x][y];
@@ -407,7 +411,7 @@ class _GameScreenState extends State<GameScreen> {
               onPressed: () {
                 setEmptyFields();
 
-                if (currentPlayer == Player.X && widget.mode == mode_vsBotEasy)
+                if (currentPlayer == Player.X && widget.mode != mode_vsFriend)
                   setState(() {
                     Random random = new Random();
                     board[random.nextInt(widget.selectedSize)]

@@ -86,18 +86,23 @@ class _MemuScreenState extends State<MemuScreen> {
               ),
               SizedBox(height: 20),
               Container(
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(100, 50),
-                      primary: Colors.white,
-                    ),
-                    child: Text("VS Bot (hard)",
-                        style: TextStyle(fontSize: 24, color: Colors.black)),
-                    onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                GameScreen(_selectedSize, mode_vsBotHard)))),
+                child: AbsorbPointer(
+                  absorbing: _selectedSize != 3,
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(100, 50),
+                        primary: _selectedSize != 3
+                            ? Colors.grey.shade300
+                            : Colors.white,
+                      ),
+                      child: Text("VS Bot (hard)",
+                          style: TextStyle(fontSize: 24, color: Colors.black)),
+                      onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  GameScreen(_selectedSize, mode_vsBotHard)))),
+                ),
               ),
               SizedBox(height: 20),
               Container(
