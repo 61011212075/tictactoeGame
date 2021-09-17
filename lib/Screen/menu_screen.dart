@@ -69,7 +69,7 @@ class _MemuScreenState extends State<MemuScreen> {
                             builder: (context) =>
                                 GameScreen(_selectedSize, mode_vsFriend)))),
               ),
-              SizedBox(height: 25),
+              SizedBox(height: 20),
               Container(
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -84,7 +84,22 @@ class _MemuScreenState extends State<MemuScreen> {
                             builder: (context) =>
                                 GameScreen(_selectedSize, mode_vsBotEasy)))),
               ),
-              SizedBox(height: 25),
+              SizedBox(height: 20),
+              Container(
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(100, 50),
+                      primary: Colors.white,
+                    ),
+                    child: Text("VS Bot (hard)",
+                        style: TextStyle(fontSize: 24, color: Colors.black)),
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                GameScreen(_selectedSize, mode_vsBotHard)))),
+              ),
+              SizedBox(height: 20),
               Container(
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -98,7 +113,7 @@ class _MemuScreenState extends State<MemuScreen> {
                         MaterialPageRoute(
                             builder: (context) => HistoryScreen()))),
               ),
-              SizedBox(height: 25),
+              SizedBox(height: 20),
               Container(
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(

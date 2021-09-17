@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:localstore/localstore.dart';
 import 'package:tictactoe/Model/history_model.dart';
 import 'package:tictactoe/Model/player_model.dart';
+import 'package:tictactoe/miniMax.dart';
 import 'package:tictactoe/properties.dart';
 
 class GameScreen extends StatefulWidget {
@@ -179,7 +180,7 @@ class _GameScreenState extends State<GameScreen> {
         board[x][y] = newValue;
       });
 
-      if (isWinner(x, y)) {
+      if (isWinnerMai(x, y)) {
         if (currentPlayer == Player.X)
           playerX_score++;
         else
@@ -203,19 +204,25 @@ class _GameScreenState extends State<GameScreen> {
 
       if (widget.mode == mode_vsBotEasy) {
         setState(() {
-          while (newValue == Player.X && !isEnd()) {
-            Random random = new Random();
-            x = random.nextInt(widget.selectedSize);
-            y = random.nextInt(widget.selectedSize);
-            if (board[x][y] == Player.none) {
-              board[x][y] = Player.O;
-              newValue = currentPlayer = Player.O;
-              break;
-            }
-          }
+          // while (newValue == Player.X && !isEnd()) {
+          //   Random random = new Random();
+          //   x = random.nextInt(widget.selectedSize);
+          //   y = random.nextInt(widget.selectedSize);
+          //   if (board[x][y] == Player.none) {
+          //     board[x][y] = Player.O;
+          //     newValue = currentPlayer = Player.O;
+          //     break;
+          //   }
+          // }
+          List<List<String>> newBoard = new List<List<String>>.from(board);
+          List<int> result = MiniMax().move(newBoard);
+          x = result[0];
+          y = result[1];
+          board[x][y] = Player.O;
+          newValue = currentPlayer = Player.O;
         });
 
-        if (isWinner(x, y)) {
+        if (isWinnerMai(x, y)) {
           if (currentPlayer == Player.X)
             playerX_score++;
           else
@@ -315,6 +322,67 @@ class _GameScreenState extends State<GameScreen> {
           bslop >= targetWin ||
           aslop >= targetWin;
     }
+  }
+
+  bool isWinnerMai(int x, int y) {
+    final player = board[x][y];
+    int slop = 0, rslop = 0, col = 0, row = 0;
+    final sizeBoard = widget.selectedSize;
+    if (sizeBoard == 3) {
+      for (int i = 0; i < sizeBoard; i++) {
+        if (board[x][i] == player) row++; //แนวนอน
+        if (board[i][y] == player) col++; // แนวตั้ง
+        if (board[i][i] == player) slop++; //แนวทะแยงจากซ้ายบนลงขวาล่าง
+        if (board[i][3 - i - 1] == player) rslop++; //แนวทะแยงจากขวาบนลงล่างซ้าย
+      }
+      return row == 3 || col == 3 || slop == 3 || rslop == 3;
+    }
+
+    //4x4 -> NxN
+    for (int i = 0; i < sizeBoard; i++) {
+      if (board[x][i] == player) row++; //แนวนอน
+      if (board[i][y] == player) col++; // แนวตั้ง
+    }
+    //แนวทะแยงจากซ้ายบนลงขวาล่าง
+    for (int i = 0; i < 4; i++) {
+      if (x + i < board.length && y + i < board.length) {
+        if (board[x + i][y + i] == player) {
+          slop++;
+        }
+      } else {
+        break;
+      }
+    }
+    for (int i = 1; i < 4; i++) {
+      if (x - i >= 0 && y - i >= 0) {
+        if (board[x - i][y - i] == player) {
+          slop++;
+        }
+      } else {
+        break;
+      }
+    }
+
+    //แนวทะแยงจากขวาบนลงล่างซ้าย
+    for (int i = 0; i < 4; i++) {
+      if (x + i < board.length && y - i >= 0) {
+        if (board[x + i][y - i] == player) {
+          rslop++;
+        }
+      } else {
+        break;
+      }
+    }
+    for (int i = 1; i < 4; i++) {
+      if (x - i >= 0 && y + i < board.length) {
+        if (board[x - i][y + i] == player) {
+          rslop++;
+        }
+      } else {
+        break;
+      }
+    }
+    return row >= 4 || col >= 4 || slop >= 4 || rslop >= 4;
   }
 
   Future showEndDialog(String title) => showDialog(
