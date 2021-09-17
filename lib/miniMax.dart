@@ -6,7 +6,7 @@ class MiniMax {
   int _miniMax(
       List<List<String>> board, int dept, bool isMaximizing, int x, int y) {
     //check winer;
-    if (isWinnerMai(x, y, board)) {
+    if (isWinner(x, y, board)) {
       return board[x][y] == Player.O ? 100 : -100;
     } else if (isEnd(board)) return 0;
 
@@ -61,7 +61,7 @@ class MiniMax {
     return bestMove;
   }
 
-  bool isWinnerMai(int x, int y, List<List<String>> board) {
+  bool isWinner(int x, int y, List<List<String>> board) {
     final player = board[x][y];
     int slop = 0, rslop = 0, col = 0, row = 0;
 
