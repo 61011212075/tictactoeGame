@@ -14,7 +14,7 @@
       - 5x5
 * เลือกโหมดไดโหมดหนึ่ง แล้วกดเริ่มเล่น
 * วิธีการชนะ 3x3 "X"หรือ"O"จะต้องเรียงกัน3ตัว และถ้าตารางเต็มโดยไม่มีผู้ชนะ จะนับเป็นการเสมอกัน
-* วิธีการชนะ 4x4 "X"หรือ"O"จะต้องเรียงกัน3ตัว และถ้าตารางเต็มโดยไม่มีผู้ชนะ จะนับเป็นการเสมอกัน
+* วิธีการชนะ 4x4 "X"หรือ"O"จะต้องเรียงกัน4ตัว และถ้าตารางเต็มโดยไม่มีผู้ชนะ จะนับเป็นการเสมอกัน
 * วิธีการชนะ 5x5 "X"หรือ"O"จะต้องเรียงกัน4ตัว และถ้าตารางเต็มโดยไม่มีผู้ชนะ จะนับเป็นการเสมอกัน
 * ถ้ามีการชนะ จะมีการเก็บคะแนน +1 เพิ่มขึ้นเลื่อยๆ เสมอก็เช่นกัน และผู้แพ้จะได้เริ่มก่อน
 ## วิธีการออกแบบ และ Algorithm ที่ใช้
@@ -39,80 +39,65 @@
       board.every((values) => values.every((value) => value != Player.none));
 ```
 * การเช็คการชนะของเกม
-   * ```targetWin``` เท่ากับ 3
    * การเช็คการชนะของเกม 3x3 โดยเช็คเฉพาะ row และ column ที่ ```player``` กด ```x``` = row และ ```y``` = column
- ```player``` คือผู้ที่กด โดยจะวน loop นับว่าเรียงกันเท่ากันกับ ```targetWin``` หรือไม่ ถ้าเท่าก็จะ return true(ชนะ) ส่วนแนวทะแยงเช็คทุกแนว
+ ```player``` คือผู้ที่กด โดยจะวน loop นับว่าเรียงกันเท่ากันกับ ```3``` หรือไม่ ถ้าเท่าก็จะ return true(ชนะ) ส่วนแนวทะแยงเช็คทุกแนว
 ``` dart
 for (int i = 0; i < sizeBoard; i++) {
         if (board[x][i] == player) row++; //แนวนอน
         if (board[i][y] == player) col++; // แนวตั้ง
         if (board[i][i] == player) slop++; //แนวทะแยงจากซ้ายบนลงขวาล่าง
-        if (board[i][sizeBoard - i - 1] == player)
-          rslop++; //แนวทะแยงจากขวาบนลงล่างซ้าย
+        if (board[i][3 - i - 1] == player) rslop++; //แนวทะแยงจากขวาบนลงล่างซ้าย
       }
-      // ถ้านับอันใดอัน เท่ากับ targetWin จะ return true
-      return row == targetWin ||
-          col == targetWin ||
-          slop == targetWin ||
-          rslop == targetWin;
+      return row == 3 || col == 3 || slop == 3 || rslop == 3;
 ```
-* การเช็คการชนะของเกม 4x4 และ 5x5
-   * ```targetWin``` ถ้า 4x4 จะเท่ากับ 3 ถ้า 5x5 จะเท่ากับ 4 
-   *   การเช็คการชนะเหมือนกับของเกม 3x3 แต่จะมีแนวทะแยงที่ติดกับแนวทะแยงตรงกลางเพิ่มขึ้นมา
+* การเช็คการชนะของเกม 4x4 และ 5x5 -> NxN
+   *   การเช็คการชนะเหมือนกับของเกม 3x3 แต่แนวทะแยงจะเช็คเฉพาะแนวทะแยงที่ ```player``` กด
 ``` dart
-   for (int i = 0; i < sizeBoard; i++) {
-        //แนวนอน
-        if (board[x][i] == player)
-          row++;
-        else {
-          row = (row == targetWin)
-              ? row
-              : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
-        }
-        // แนวตั้ง
-        if (board[i][y] == player)
-          col++;
-        else {
-          col = (col == targetWin)
-              ? col
-              : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
-        }
-        //แนวทะแยงจากซ้ายบนลงขวาล่าง
-        if (board[i][i] == player) {
+   //4x4 -> NxN
+    for (int i = 0; i < sizeBoard; i++) {
+      if (board[x][i] == player) row++; //แนวนอน
+      if (board[i][y] == player) col++; // แนวตั้ง
+    }
+    //แนวทะแยงจากซ้ายบนลงขวาล่าง
+    for (int i = 0; i < 4; i++) {
+      if (x + i < board.length && y + i < board.length) {
+        if (board[x + i][y + i] == player) {
           slop++;
-        } else if (i < sizeBoard - 1) {
-          if (board[i + 1][i] == player)
-            bslop++; //แนวทะแยงจากซ้ายบนลงขวาล่าง ด้านสั้น
-          if (board[i][i + 1] == player)
-            aslop++; //แนวทะแยงจากซ้ายบนลงขวาล่าง ด้านสั้น
-        } else {
-          slop = (slop == targetWin)
-              ? slop
-              : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
         }
-        //แนวทะแยงจากขวาบนลงล่างซ้าย
-        if (board[i][sizeBoard - i - 1] == player) {
-          rslop++;
-        } else if (i < sizeBoard - 1) {
-          if (board[i][sizeBoard - i - 2] == player)
-            brslop++; //แนวทะแยงจากขวาบนลงล่างซ้าย ด้านสั้น
-          if (board[i + 1][sizeBoard - i - 1] == player)
-            arslop++; //แนวทะแยงจากขวาบนลงล่างซ้าย ด้านสั้น
-        } else {
-          rslop = (rslop == targetWin)
-              ? rslop
-              : 0; //ถ้านับแล้วไม่ต่อเนื่องเริ่ม 0 ใหม่ ถ้าเท่ากับ targetWin แล้วจะไม่เปลี่ยนค่า
-        }
+      } else {
+        break;
       }
-      // ถ้านับอันใดอัน เท่ากับ targetWin จะ return true
-      return row >= targetWin ||
-          col >= targetWin ||
-          slop >= targetWin ||
-          rslop >= targetWin ||
-          brslop >= targetWin ||
-          arslop >= targetWin ||
-          bslop >= targetWin ||
-          aslop >= targetWin;
+    }
+    for (int i = 1; i < 4; i++) {
+      if (x - i >= 0 && y - i >= 0) {
+        if (board[x - i][y - i] == player) {
+          slop++;
+        }
+      } else {
+        break;
+      }
+    }
+
+    //แนวทะแยงจากขวาบนลงล่างซ้าย
+    for (int i = 0; i < 4; i++) {
+      if (x + i < board.length && y - i >= 0) {
+        if (board[x + i][y - i] == player) {
+          rslop++;
+        }
+      } else {
+        break;
+      }
+    }
+    for (int i = 1; i < 4; i++) {
+      if (x - i >= 0 && y + i < board.length) {
+        if (board[x - i][y + i] == player) {
+          rslop++;
+        }
+      } else {
+        break;
+      }
+    }
+    return row >= 4 || col >= 4 || slop >= 4 || rslop >= 4;
 ```
 * การเก็บ History ของเกม
    * ใช้ localstore 1.2.0
